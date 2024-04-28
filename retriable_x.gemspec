@@ -6,19 +6,19 @@ Gem::Specification.new do |spec|
   spec.name = "retriable_x"
   spec.version = RetriableX::VERSION
   spec.authors = ["aoyagikouhei"]
-  spec.email = ["aoyagi_kouhei@uniquevision.co.jp"]
+  spec.email = ["aoyagi.kouhei@gmail.com"]
 
-  spec.summary = "TODO: Write a short summary, because RubyGems requires one."
-  spec.description = "TODO: Write a longer description or delete this line."
-  spec.homepage = "TODO: Put your gem's website or public repo URL here."
+  spec.summary = "X library with retriable"
+  spec.description = "X library with retriable"
+  spec.homepage = "https://github.com/aoyagikouhei/retriable-x-ruby"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 3.2.0"
 
   spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata["source_code_uri"] = "https://github.com/aoyagikouhei/retriable-x-ruby"
+  spec.metadata["changelog_uri"] = "https://github.com/aoyagikouhei/retriable-x-ruby/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
@@ -35,6 +35,8 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_runtime_dependency 'twitter_oauth2', '~> 0.5.1'
+  spec.add_runtime_dependency  'x', '~> 0.14.1'
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
