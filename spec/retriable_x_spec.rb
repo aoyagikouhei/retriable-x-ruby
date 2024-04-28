@@ -13,7 +13,7 @@ RSpec.describe RetriableX do
     expect(RetriableX::Scopes::FollowCheck).to eq([:"users.read", :"offline.access"])
   end
 
-  it "client new" do
+  it "oauth client new" do
     expect(RetriableX::Oauth2Client::new("a", "b", "c")).not_to be nil
   end
 
@@ -23,5 +23,23 @@ RSpec.describe RetriableX do
     expect(url).not_to be nil
     expect(pkce).not_to be nil
     expect(state).not_to be nil
+  end
+
+  it "client new" do
+    expect(RetriableX::Client::new(access_token: 'a')).not_to be nil
+  end
+
+  it "client me error" do
+    client = RetriableX::Client::new(access_token: 'a')
+    expect{client.me()}.to raise_error(X::Forbidden)
+  end
+
+  it "client follow?" do
+    client = RetriableX::Client::new(access_token: 'a')
+    expect(client.send(:follow?, "{}")).to be false
+    data = {data: {
+      connection_status: ["following"]
+    }}
+    expect(client.send(:follow?, data.to_json)).to be true
   end
 end
