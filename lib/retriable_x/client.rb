@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'x'
+require "json"
+require "x"
 
 module RetriableX
+  # X Client
   class Client
     # @param access_token [String] OAuth2 access token
     # @param refresh_token [String] OAuth2 refresh token
@@ -19,25 +20,20 @@ module RetriableX
       @args = args
       @try_count = @args[:try_count] || 1
       @retry_delay = @args[:retry_delay] || 0
-      @client = RetriableX::Client::make_client(@args)
+      @client = make_client(@args)
     end
 
-    def me()
-      execute do |count|
+    def me
+      execute do |_count|
         @client.get("users/me")
       end
     end
 
     def follow_check_screenname(screenname)
-      res = execute do |count|
+      res = execute do |_count|
         @client.get("users/by/username/#{screenname}?user.fields=connection_status")
       end
       follow?(res)
-    end
-
-    def refresh(refresh_token)
-      @client.refresh_token = refresh_token
-      @client.access_token!
     end
 
     private
@@ -47,31 +43,32 @@ module RetriableX
       refreshed_flag = false
       loop do
         return yield(count)
-      rescue => e
-        if e.is_a?(X::Unauthorized)
-          # try once refresh
-          if is_refresh?() && !refreshed_flag
-            refreshed_flag = true
-            refresh()
-            continue
-          else
-            raise e
-          end
-        end
-        raise e if @try_count <= count
-        count += 1
-        sleep @retry_delay if @retry_delay > 0
+      rescue StandardError => e
+        count, refreshed_flag = check_err(e, count, refreshed_flag)
       end
     end
 
-    def is_refresh?
+    def check_err(err, count, refreshed_flag)
+      if err.is_a?(X::Unauthorized)
+        raise err unless refresh? && !refreshed_flag
+
+        refresh
+        return [count, true]
+      end
+      raise err if @try_count <= count
+
+      sleep @retry_delay if @retry_delay.positive?
+      [count + 1, refreshed_flag]
+    end
+
+    def refresh?
       !@args[:refresh_token].nil? &&
         !@args[:client_key].nil? &&
         !@args[:client_secret].nil?
     end
 
     def refresh
-      client = RetriableX::Oauth2Client::new(@args[:client_key], @args[:client_secret], '')
+      client = RetriableX::Oauth2Client.new(@args)
       token = client.refresh(@args[:refresh_token])
       @args[:refresh_token] = token.refresh_token
       @args[:access_token] = token.access_token
@@ -83,20 +80,23 @@ module RetriableX
       connection_status.include?("following")
     end
 
-    def self.make_client(args)
+    def make_client(args)
       if !args[:api_key].nil?
-        X::Client.new(
-          api_key: args[:consumer_key],
-          api_key_secret: args[:consumer_secret],
-          access_token: args[:access_key],
-          access_token_secret: args[:access_secret] )
+        make_client_oauth1(args)
       elsif !args[:access_token].nil?
         X::Client.new(bearer_token: args[:access_token])
       else
         raise "OAuth key not found"
       end
     end
+
+    def make_client_oauth1(args)
+      X::Client.new(
+        api_key: args[:consumer_key],
+        api_key_secret: args[:consumer_secret],
+        access_token: args[:access_key],
+        access_token_secret: args[:access_secret]
+      )
+    end
   end
 end
-
-

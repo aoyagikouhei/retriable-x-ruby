@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "X library with retriable"
   spec.homepage = "https://github.com/aoyagikouhei/retriable-x-ruby"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.2.0"
+  spec.required_ruby_version = ">= 3.0.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/aoyagikouhei/retriable-x-ruby"
@@ -33,8 +33,8 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
-  spec.add_runtime_dependency 'twitter_oauth2', '~> 0.5.1'
-  spec.add_runtime_dependency  'x', '~> 0.14.1'
+  spec.add_runtime_dependency "twitter_oauth2", "~> 0.5.1"
+  spec.add_runtime_dependency "x", "~> 0.14.1"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

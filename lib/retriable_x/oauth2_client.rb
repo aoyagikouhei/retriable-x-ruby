@@ -1,14 +1,19 @@
 # frozen_string_literal: true
 
-require 'twitter_oauth2'
+require "twitter_oauth2"
 
 module RetriableX
+  # OAuth2 Client
   class Oauth2Client
-    def initialize(client_id, client_secret, redirect_uri)
+    # @param client_key [String] OAuth2 client_key
+    # @param client_secret [String] OAuth2 client_secret
+    # @param redirect_uri [String] OAuth2 redirect_uri
+    def initialize(**args)
+      @args = args
       @client = TwitterOAuth2::Client.new(
-        identifier: client_id,
-        secret: client_secret,
-        redirect_uri: redirect_uri
+        identifier: @args[:client_id],
+        secret: @args[:client_secret],
+        redirect_uri: @args[:redirect_uri] || ""
       )
     end
 
@@ -17,12 +22,12 @@ module RetriableX
       [authorization_uri, @client.code_verifier, @client.state]
     end
 
-    def access_token(code, code_verifier)
+    def access_token!(code, code_verifier)
       @client.authorization_code = code
       @client.access_token! code_verifier
     end
 
-    def refresh(refresh_token)
+    def refresh!(refresh_token)
       @client.refresh_token = refresh_token
       @client.access_token!
     end
