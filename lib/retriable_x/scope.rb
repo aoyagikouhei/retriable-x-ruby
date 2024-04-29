@@ -25,6 +25,6 @@ module RetriableX
   end
 
   module Scopes
-    FollowCheck = [RetriableX::Scope::UsersRead, RetriableX::Scope::OfflineAccess]
+    FollowCheck = [RetriableX::Scope::TweetRead, RetriableX::Scope::UsersRead, RetriableX::Scope::OfflineAccess]
   end
 end

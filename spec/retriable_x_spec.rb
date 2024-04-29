@@ -10,7 +10,7 @@ RSpec.describe RetriableX do
   end
 
   it "scopes" do
-    expect(RetriableX::Scopes::FollowCheck).to eq([:"users.read", :"offline.access"])
+    expect(RetriableX::Scopes::FollowCheck).to eq([:"tweet.read", :"users.read", :"offline.access"])
   end
 
   it "oauth client new" do
@@ -34,12 +34,17 @@ RSpec.describe RetriableX do
     expect{client.me()}.to raise_error(X::Forbidden)
   end
 
+  it "client follow_check_screenname error" do
+    client = RetriableX::Client::new(access_token: 'a')
+    expect{client.follow_check_screenname('aoyagikouhei')}.to raise_error(X::Unauthorized)
+  end
+
   it "client follow?" do
     client = RetriableX::Client::new(access_token: 'a')
-    expect(client.send(:follow?, "{}")).to be false
-    data = {data: {
-      connection_status: ["following"]
+    expect(client.send(:follow?, {})).to be false
+    data = {"data": {
+      "connection_status": ["following"]
     }}
-    expect(client.send(:follow?, data.to_json)).to be true
+    expect(client.send(:follow?, data)).to be true
   end
 end

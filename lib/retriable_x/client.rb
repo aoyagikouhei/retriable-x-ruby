@@ -19,7 +19,7 @@ module RetriableX
       @args = args
       @try_count = @args[:try_count] || 1
       @retry_delay = @args[:retry_delay] || 0
-      @client = make_client(@args)
+      @client = RetriableX::Client::make_client(@args)
     end
 
     def me()
@@ -30,7 +30,7 @@ module RetriableX
 
     def follow_check_screenname(screenname)
       res = execute do |count|
-        x_client.get("users/by/username/#{screenname}?user.fields=connection_status")
+        @client.get("users/by/username/#{screenname}?user.fields=connection_status")
       end
       follow?(res)
     end
@@ -79,25 +79,24 @@ module RetriableX
     end
 
     def follow?(src)
-      data = JSON.parse(src)
-      connection_status = data.dig("data", "connection_status") || []
+      connection_status = src.dig("data", "connection_status") || src.dig(:data, :connection_status) || []
       connection_status.include?("following")
+    end
+
+    def self.make_client(args)
+      if !args[:api_key].nil?
+        X::Client.new(
+          api_key: args[:consumer_key],
+          api_key_secret: args[:consumer_secret],
+          access_token: args[:access_key],
+          access_token_secret: args[:access_secret] )
+      elsif !args[:access_token].nil?
+        X::Client.new(bearer_token: args[:access_token])
+      else
+        raise "OAuth key not found"
+      end
     end
   end
 end
 
-private
 
-def make_client(args)
-  if !args[:api_key].nil?
-    X::Client.new(
-      api_key: args[:consumer_key],
-      api_key_secret: args[:consumer_secret],
-      access_token: args[:access_key],
-      access_token_secret: args[:access_secret] )
-  elsif !args[:access_token].nil?
-    X::Client.new(bearer_token: args[:access_token])
-  else
-    raise "OAuth key not found"
-  end
-end
